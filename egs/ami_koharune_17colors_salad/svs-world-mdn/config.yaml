@@ -1,0 +1,99 @@
+### General settings.
+## NNSVS root
+
+#nnsvs_root: "~/works/notebook/nnsvs_pr/nnsvs_no_commit"
+nnsvs_root: "../../../../../nnsvs_pr/nnsvs_no_commit"
+
+
+## The name of singer
+spk: "ami_koharune"
+
+## exp tag(for managing experiments)
+tag:
+  
+## Directory of Unzipped singing voice database
+# PLEASE CHANGE THE PATH BASED ON YOUR ENVIRONMENT
+db_root: "~/data/AmiKoharune17/"
+
+## Output directory
+out_dir: "./data"
+
+
+## Output directory
+# All the generated labels, intermediate files, and segmented wav files
+# will be saved in the following directory
+out_dir: "./data"
+
+## Data to be excluded
+exclude_data_dir: ["310_ハミング", "400_母音ロングトーン・語尾息", "410_尖母音", "420_囁母音", "500_ブレス"]
+exclude_data_name: []
+
+## HTS-style question used for extracting musical/linguistic context from musicxml files
+question_path: "../../_common/hed/jp_qst003_nnsvs.hed"
+
+
+### Data preparation related settings.
+## SHIRO related settings
+# SHIRO root directory
+shiro_root: "/mnt/d/wslhome/tyuyu/works/shiro/SHIRO"
+
+# Offset correction
+# If True, offset is computed in an entire song
+# otherwise offset is computed for each segment
+global_offset_correction: False
+offset_correction_threshold: 0.005
+# Time-lag constraints to filter outliers
+timelag_allowed_range: [-20, 19]
+timelag_allowed_range_rest: [-40, 39]
+# Audio sampling rate
+# CAUTION: Changing sample_rate may affect the dimension number of acoustic features.
+# DO NOT CHANGE this unless you know the relationship between the dim of bap and sample_rate.
+sample_rate: 48000
+
+gain_normalize: False
+
+###########################################################
+#                FEATURE EXTRACTION SETTING               #
+###########################################################
+
+timelag_features: defaults
+duration_features: defaults
+acoustic_features: static_deltadelta
+
+###########################################################
+#                TRAINING SETTING                         #
+###########################################################
+
+# Models
+# To customize, put your config or change ones in
+# conf/train/{timelag,duration,acoustic}/ and
+# specify the config name below
+# NOTE: *_model: model definition, *_train: general train configs,
+# *_data: data configs (e.g., batch size)
+
+timelag_model: timelag_ffn
+timelag_train: myconfig
+timelag_data: myconfig
+
+duration_model: duration_rmdn
+duration_train: myconfig
+duration_data: myconfig
+
+acoustic_model: acoustic_rmdn
+acoustic_train: myconfig
+acoustic_data: myconfig
+
+# Pretrained model dir (leave empty to disable)
+pretrained_expdir: ../../../../../nnsvs_pr/nnsvs_no_commit/egs/oniku_kurumi_utagoe_db/svs-world-mdn-pre/exp/oniku_kurumi/
+
+###########################################################
+#                SYNTHESIS SETTING                        #
+###########################################################
+timelag_synthesis: defaults
+duration_synthesis: defaults
+acoustic_synthesis: defaults
+
+# latest.pth or best.pth
+timelag_eval_checkpoint: best_loss.pth
+duration_eval_checkpoint: best_loss.pth
+acoustic_eval_checkpoint: best_loss.pth
