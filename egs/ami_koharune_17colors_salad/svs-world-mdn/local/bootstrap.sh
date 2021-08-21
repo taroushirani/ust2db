@@ -11,15 +11,15 @@ function xrun () {
 }
 
 script_dir=$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)
-genon2db_root=$script_dir/../../../../
+ust2db_root=$script_dir/../../../../
 
-. $genon2db_root/utils/yaml_parser.sh || exit 1;
+. $ust2db_root/utils/yaml_parser.sh || exit 1;
 
 stage=-1
 stop_stage=-1
 config_yaml="./config.yaml"
 
-. $genon2db_root/utils/parse_options.sh || exit 1;
+. $ust2db_root/utils/parse_options.sh || exit 1;
 
 eval $(parse_yaml $config_yaml "")
 
@@ -42,7 +42,7 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     # clean up
     rm -rf $out_dir
     # copy
-    #    python $genon2db_root/utils/data_prep.py $config_yaml
+    #    python $ust2db_root/utils/data_prep.py $config_yaml
     python $script_dir/data_copy.py $config_yaml
 fi
 
@@ -55,7 +55,7 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     mkdir -p $shiro_out_dir
     #echo $shiro_root_abs
     # create index
-    python $genon2db_root/utils/wav2index.py $out_dir/wav/ $script_dir/../dic/ly2ph_ami_koharune.table $shiro_out_dir/index.csv
+    python $ust2db_root/utils/wav2index.py $out_dir/wav/ $script_dir/../dic/ly2ph_ami_koharune.table $shiro_out_dir/index.csv
 
     # Create model and  phoneme definitions for Japanese
     lua $shiro_root/shiro-mkpm.lua ../../_common/shiro/japanese-phoneset.csv -s 3 -S 3 > $shiro_out_dir/phonemap.json
@@ -100,7 +100,7 @@ if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
     mkdir $out_dir/mono
 
     # convert audacity label files to hts mono-phone label
-    python $genon2db_root/utils/txt2lab.py $out_dir/wav/ $out_dir/mono --rounding
+    python $ust2db_root/utils/txt2lab.py $out_dir/wav/ $out_dir/mono --rounding
 fi
 
 if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
@@ -113,7 +113,7 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
     
     # generate ust files from mono-phone labels
     echo "generate ust files from mono-phone labels"
-    python $genon2db_root/utils/lab2ust.py $out_dir/mono $out_dir/ust
+    python $ust2db_root/utils/lab2ust.py $out_dir/mono $out_dir/ust
 
     if [ -e $out_dir/ust_full ]; then
 	rm -rf $out_dir/ust_full
@@ -123,7 +123,7 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
     # generate HTS full-context label files
     echo "generate HTS full-context label files"
 
-    python $genon2db_root/utils/ust2lab.py $out_dir/ust/ $out_dir/ust_full ../../_common/dic/identity.table
+    python $ust2db_root/utils/ust2lab.py $out_dir/ust/ $out_dir/ust_full ../../_common/dic/identity.table
 
 
     if [ -e $out_dir/full ]; then
@@ -133,5 +133,5 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
     
     # Copy label times from mono to full
     echo "Copy label times from mono to full"
-    python $genon2db_root/utils/adjust_lab_times.py $out_dir/mono $out_dir/ust_full/ $out_dir/full/
+    python $ust2db_root/utils/adjust_lab_times.py $out_dir/mono $out_dir/ust_full/ $out_dir/full/
 fi

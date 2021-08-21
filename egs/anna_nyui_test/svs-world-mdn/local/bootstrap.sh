@@ -11,15 +11,15 @@ function xrun () {
 }
 
 script_dir=$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)
-genon2db_root=$script_dir/../../../../
+ust2db_root=$script_dir/../../../../
 
-. $genon2db_root/utils/yaml_parser.sh || exit 1;
+. $ust2db_root/utils/yaml_parser.sh || exit 1;
 
 stage=-1
 stop_stage=-1
 config_yaml="./config.yaml"
 
-. $genon2db_root/utils/parse_options.sh || exit 1;
+. $ust2db_root/utils/parse_options.sh || exit 1;
 
 eval $(parse_yaml $config_yaml "")
 
@@ -60,10 +60,10 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     mkdir -p $out_dir/ust_full
     mkdir -p $out_dir/ust_mono
     echo "Create HTS full-context label file from ust"
-    python $genon2db_root/utils/ust2lab.py $out_dir/ust/ $out_dir/ust_full \
+    python $ust2db_root/utils/ust2lab.py $out_dir/ust/ $out_dir/ust_full \
 	   $script_dir/../dic/ly2ph_anna_nyui.table
     echo "Create mono-phone label file from ust"    
-    python $genon2db_root/utils/ust2lab.py $out_dir/ust/ $out_dir/ust_mono \
+    python $ust2db_root/utils/ust2lab.py $out_dir/ust/ $out_dir/ust_mono \
 	   $script_dir/../dic/ly2ph_anna_nyui.table --as_mono
 
     # perf segmentation
@@ -83,7 +83,7 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
 
     mkdir -p $out_dir/aud_lab
     echo "Convert mono-phone label to audacity label"
-    python $genon2db_root/utils/lab2txt.py $out_dir/ust_mono_seg $out_dir/aud_lab
+    python $ust2db_root/utils/lab2txt.py $out_dir/ust_mono_seg $out_dir/aud_lab
 
     if [ -e $shiro_out_dir ]; then
 	rm -rf $shiro_out_dir
@@ -91,7 +91,7 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     mkdir -p $shiro_out_dir
 
     echo "Create index file from mono-phone labels"
-    python $genon2db_root/utils/lab2index.py $out_dir/ust_mono_seg/ $shiro_out_dir/index.csv
+    python $ust2db_root/utils/lab2index.py $out_dir/ust_mono_seg/ $shiro_out_dir/index.csv
 
     # Create model and  phoneme definitions for Japanese
     lua $shiro_root/shiro-mkpm.lua ../../_common/shiro/japanese-phoneset.csv -s 3 -S 3 > $shiro_out_dir/phonemap.json
@@ -147,7 +147,7 @@ if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
     mkdir $out_dir/mono
 
     # convert audacity label files to hts mono-phone label
-    python $genon2db_root/utils/txt2lab.py $out_dir/wav_seg/ $out_dir/mono --rounding
+    python $ust2db_root/utils/txt2lab.py $out_dir/wav_seg/ $out_dir/mono --rounding
 fi
 
 if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
@@ -160,12 +160,12 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
     fi
     mkdir $out_dir/full
     
-    python $genon2db_root/utils/adjust_lab_times.py $out_dir/mono $out_dir/ust_full_seg/ $out_dir/full/
+    python $ust2db_root/utils/adjust_lab_times.py $out_dir/mono $out_dir/ust_full_seg/ $out_dir/full/
 fi
 
 if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ]; then
     echo "stage 4: Merge Mono-phone labels"
     
-    python $genon2db_root/utils/merge_lab.py $out_dir/offset.csv $out_dir/mono $out_dir/wav
+    python $ust2db_root/utils/merge_lab.py $out_dir/offset.csv $out_dir/mono $out_dir/wav
     
 fi
