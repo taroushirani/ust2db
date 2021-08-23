@@ -65,6 +65,7 @@ fi
 
 if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     echo "stage 1: Feature generation"
+#    export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libasan.so.5
     . $NNSVS_COMMON_ROOT/feature_generation.sh
 fi
 
